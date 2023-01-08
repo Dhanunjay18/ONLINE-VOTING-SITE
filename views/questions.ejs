@@ -23,6 +23,8 @@
                     <% } %>
                     <a href="/elections/<%= election.id %>/questions" style="color:blue"> Click here to create the Question </a>
                     <br><br>
+                    <a href="/elections/<%= election.id %>/voters" style="color:blue"> Click here to manage the Voters for Election </a>
+                    <br><br>
                     <% if(messages && messages.error && messages.error.length > 0)  { %>
                         <% for(var i=0; i<messages.error.length; i++) { %>
                             <li class="text-red-600"> <%= messages.error[i] %></li>
@@ -31,5 +33,5 @@
                             
                     <p style="float: left;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/signout">Sign Out</a></p>
                     </div>
-                    </body>
-                    </html>
+    </body>
+</html>

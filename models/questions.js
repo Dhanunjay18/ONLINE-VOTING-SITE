@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
   Questions.init(
     {
       title: DataTypes.STRING,
+      description: DataTypes.STRING,
     },
     {
       sequelize,

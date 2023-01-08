@@ -1,0 +1,11 @@
+<span id="count-<%= title %>" style="float:right; font-weight: bolder;"> Total :  <%= data.length %> </span>
+<h5 class="text-lg" style="font-family: 'Times New Roman', Times, serif;font-weight: bolder;"><%= title %></h5>
+<ul class="list-none">
+    <% for(var i=0; i<data.length; i++) { %> 
+    <li class="Todo-item">
+        <div class="hover:bg-rose-600 flex-none items-center rounded w-full  my-2 px-2 py-1">
+            <h3 class="text-lg cursor-pointer mx-2"><%= data[i].vid %></h3>
+        </div>                         
+    </li>
+    <% } %>
+</ul>

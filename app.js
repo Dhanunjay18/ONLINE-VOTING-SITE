@@ -155,6 +155,66 @@ app.get(
 );
 
 app.get(
+  "/elections/:eid/voters",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    const loggedInAdmin = request.user.id;
+    const eid = request.params.eid;
+    const election = await Elections.getElections(loggedInAdmin);
+    const voters = await Voters.findAll({ where: { eid: eid } });
+    if (request.accepts("html")) {
+      response.render("newVoter", {
+        election,
+        eid,
+        voters,
+        title: "Add Voter",
+        name: request.user.email,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        election,
+      });
+    }
+  }
+);
+
+app.post(
+  "/elections/:eid/voters",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const eid = request.params.eid;
+    console.log("Entered into ", eid);
+    if (request.body.vid.length === 0 || request.body.vpass.length === 0) {
+      request.flash("error", "Enter a Valid Voter ID and Password");
+      return response.redirect(`/elections/${eid}/voters`);
+    }
+    const val = await Voters.findOne({
+      where: {
+        vid: request.body.vid,
+        eid: request.params.eid,
+      },
+    });
+    if (val != null) {
+      request.flash("error", "Voter Already Exists");
+      return response.redirect(`/elections/${eid}/voters`);
+    }
+    const loggedInUser = request.user.id;
+    try {
+      await Voters.create({
+        vid: request.body.vid,
+        password: request.body.vpass,
+        eid: request.params.eid,
+      });
+      return response.redirect(`/elections/${eid}/voters`);
+    } catch (error) {
+      console.log(error);
+      return response.redirect(`/elections/${eid}/voters`);
+    }
+  }
+);
+
+app.get(
   "/new",
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
@@ -219,9 +279,9 @@ app.post(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const eid = request.params.eid;
-    console.log("Entered into ", eid);
-    if (request.body.name.length === 0) {
-      request.flash("error", "Enter a Valid Question");
+    console.log("Descriptoin ", request.body.desc);
+    if (request.body.name.length === 0 || request.body.desc.length === 0) {
+      request.flash("error", "Fill both Title and Description");
       return response.redirect(`/elections/${eid}/questions`);
     }
     const val = await Questions.findOne({
@@ -239,6 +299,7 @@ app.post(
       await Questions.create({
         title: request.body.name,
         eid: request.params.eid,
+        description: request.body.desc,
       });
       const qid = await Questions.findOne({
         where: {

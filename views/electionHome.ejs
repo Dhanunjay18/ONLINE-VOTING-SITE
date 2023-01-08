@@ -15,6 +15,7 @@
             <hr>  
             <h3 class="font-bold text-2xl py-4"> You have <%= questions.length %> questions created in your ballot </h3>    
             <a href="/elections/<%= election.id %>/questions"> Click here to Manage Questions </a>
+            <a href="/elections/<%= election.id %>/questions"> Click here to Manage Voters </a>
             <% if(messages && messages.error && messages.error.length > 0)  { %>
                 <% for(var i=0; i<messages.error.length; i++) { %>
                         <li class="text-red-600"> <%= messages.error[i] %></li>
