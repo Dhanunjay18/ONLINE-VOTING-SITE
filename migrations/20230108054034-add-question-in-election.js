@@ -10,9 +10,9 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      *
      */
-    // await queryInterface.addColumn("Questions", "eid", {
-    //   type: Sequelize.DataTypes.INTEGER,
-    // });
+    await queryInterface.addColumn("Questions", "eid", {
+      type: Sequelize.DataTypes.INTEGER,
+    });
 
     await queryInterface.addConstraint("Questions", {
       fields: ["eid"],
