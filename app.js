@@ -370,11 +370,11 @@ app.post("/admins", async (request, response) => {
       if (err) {
         console.log(err);
       }
-      response.redirect("/elections");
+      return response.redirect("/elections");
     });
   } catch (error) {
     console.log(error);
-    response.redirect("/signup");
+    return response.redirect("/signup");
   }
 });
 
