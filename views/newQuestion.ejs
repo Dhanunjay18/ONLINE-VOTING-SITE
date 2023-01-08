@@ -12,14 +12,17 @@
 <body class="bg-blue-300">
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
-            <h1 class="font-semibold text-2xl"> Create New Question </h1>
+            <h1 class="font-semibold text-2xl"> Create New Question</h1>
             <form action="/elections/<%= eid %>/questions" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <div class="flex py-2">
                     <div class="flex-auto px-2">
-                        <input name="name" type="text" placeholder="Eg: Election 2k22" class="border border-solid text-black px-2 w-full rounded" />
+                        <!-- <input name="name" type="text" placeholder="Eg: Election 2k22" class="border border-solid text-black px-2 w-full rounded" /> -->
+                        Enter Question : 
+                        <textarea class="border border-solid text-black px-2 w-full rounded" name="name"></textarea>
+                        Enter Description
+                        <textarea class="border border-solid text-black px-2 w-full rounded" name="desc"></textarea>
                     </div>
-                    <h1><%= eid %></h1>
                     <br>
                     <div class="flex-auto px-2">
                         <button type="submit" class="border rounded bg-rose-600 border-solid text-white px-2 w-full rounded">Submit</button>                        
