@@ -13,6 +13,7 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <h1 class="font-semibold text-2xl"> Create New Question</h1>
+            <a href="./" style="color: blue;"> ..Go back </a> 
             <form action="/elections/<%= eid %>/questions" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <div class="flex py-2">
@@ -22,10 +23,8 @@
                         <textarea class="border border-solid text-black px-2 w-full rounded" name="name"></textarea>
                         Enter Description
                         <textarea class="border border-solid text-black px-2 w-full rounded" name="desc"></textarea>
-                    </div>
-                    <br>
-                    <div class="flex-auto px-2">
-                        <button type="submit" class="border rounded bg-rose-600 border-solid text-white px-2 w-full rounded">Submit</button>                        
+                        <br>
+                        <input type="submit" value="Submit" class="text-black bg-rose-600 hover:bg-white-800 font-medium rounded px-5 py-2">
                     </div>
                 </div>
             </form>

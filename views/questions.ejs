@@ -12,24 +12,24 @@
 <body class="bg-blue-300">
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
-            <%- include('header.ejs') %>
-            <p style="float: right;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/signout">Sign Out</a></p>
-            <h1 class="font-semibold text-2xl"> Welcome <%= questions.title %>! </h1>
+            <h1 class="font-semibold text-2xl"> Welcome to <%= election.name %> Ballot! </h1>
+            <a href="/elections" style="color: blue;"> ..Go back </a> 
             <% if(questions.length === 0 ) { %>
-                <h3>You Haven't Created any Questions Yet </h3>
+                <h2>You Haven't Created any Questions Yet </h2>
                 <% } else { %>
                     <div>
                         <%- include('listQuestion.ejs', {title:'Created questions', data: questions}) %>
                     </div>
-                <% } %>
-                <a href="/elections/<%= election.id %>/questions" style="color:blue"> Click here to create the Question </a>
-                <br>
-            <% if(messages && messages.error && messages.error.length > 0)  { %>
-                <% for(var i=0; i<messages.error.length; i++) { %>
-                        <li class="text-red-600"> <%= messages.error[i] %></li>
-                <% } %>
-              <% } %>
-            
-    </div>
-</body>
-</html>
+                    <% } %>
+                    <a href="/elections/<%= election.id %>/questions" style="color:blue"> Click here to create the Question </a>
+                    <br><br>
+                    <% if(messages && messages.error && messages.error.length > 0)  { %>
+                        <% for(var i=0; i<messages.error.length; i++) { %>
+                            <li class="text-red-600"> <%= messages.error[i] %></li>
+                            <% } %>
+                            <% } %>
+                            
+                    <p style="float: left;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/signout">Sign Out</a></p>
+                    </div>
+                    </body>
+                    </html>
