@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const express = require("express");
 const app = express();
-const { Todo, Admin, Elections, Questions } = require("./models");
+const { Admin, Elections, Questions, Voters } = require("./models");
 const csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
@@ -317,27 +317,6 @@ app.post(
   }
 );
 
-app.get("/todos", async function (_request, response) {
-  console.log("Processing list of all Todos ...");
-  try {
-    const todos = await Todo.findAll();
-    return response.send(todos);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-
-app.get("/todos/:id", async function (request, response) {
-  try {
-    const todo = await Todo.findByPk(request.params.id);
-    return response.json(todo);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-
 app.delete(
   "/elections/:id",
   connectEnsureLogin.ensureLoggedIn(),
@@ -427,22 +406,6 @@ app.post(
   function (request, response) {
     console.log(request.user);
     response.redirect("/elections");
-  }
-);
-
-app.put(
-  "/todos/:id",
-  connectEnsureLogin.ensureLoggedIn(),
-  async function (request, response) {
-    console.log("Putting a todos` completion status: ", request.params.id);
-    try {
-      const todo = await Todo.findByPk(request.params.id);
-      return response.json(
-        await todo.setCompletionStatus(request.body.completed)
-      );
-    } catch (error) {
-      return response.status(422).json(error);
-    }
   }
 );
 
