@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <link href="./css/styles.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>My Todo Mangement Application</title>
+</head>
+<body class="bg-blue-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %>
+            <p class="py-2">Welcome to the Voting Application</p>
+            <p class="py-2">New Here? <a href="/signup" class="text-rose-600">SignUp Now </a></p>
+            <p class="py-2">Already Visited? <a href="/login" class="text-rose-600">Login</a></p>
+        </div>
+    </div>
+</body>
+</html>

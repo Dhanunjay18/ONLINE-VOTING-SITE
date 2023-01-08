@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <link href="./css/styles.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title> Voting Platform </title>
+    <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content");
+            // function updateTodo(id) {
+            function updateTodo(id, boolean_value) {   // Juz pass two parameters second one is boolean value
+                console.log("Here");
+                fetch(`/todos/${id}`, {                // Remove markAsCompleted and just keeep id
+                // fetch(`/todos/${id}/markAsCompleted`, {
+                method: "put",
+                headers: { 
+                    "Content-Type": "application/json" ,
+                },
+                body: JSON.stringify(
+                    {
+                        "_csrf": token,
+                        completed: boolean_value,  // As mentioned requirement we should pass boolean value in PUT method to check completed
+                    }
+                )
+            })
+            .then((res) => {
+                if(res.ok){
+                    window.location.reload();
+                }
+            })
+            .catch((err) => console.error(err)); 
+        }
+        function deleteElection(id) {
+            fetch(`/elections/${id}`, {
+                method: "delete",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ 
+                    "_csrf": token
+                })
+            })
+            .then((res) => {
+                if(res.ok) window.location.reload();
+            })
+            .catch((err) => console.error(err)); 
+        }
+    </script>
+</head>
+<body class="bg-blue-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %>
+            <p style="float: right;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/signout">Sign Out</a></p>
+            <h1 class="font-semibold text-2xl"> Welcome <%= name %>! </h1>
+            <% if(elections.length === 0 ) { %>
+                <h3>You Haven't Created any Elections </h3>
+                <% } else { %>
+                    <div>
+                        <%- include('list.ejs', {title:'Created Elections', data: elections}) %>
+                    </div>
+                <% } %>
+                <a href="/new" style="color:blue"> Click here to create an election </a>
+            <% if(messages && messages.error && messages.error.length > 0)  { %>
+                <% for(var i=0; i<messages.error.length; i++) { %>
+                        <li class="text-red-600"> <%= messages.error[i] %></li>
+                <% } %>
+              <% } %>
+            
+    </div>
+</body>
+</html>
