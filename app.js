@@ -83,7 +83,12 @@ passport.deserializeUser((id, done) => {
 });
 
 app.get("/", async function (request, response) {
+  let booool = false;
+  if (request.user) {
+    booool = true;
+  }
   response.render("index", {
+    loginStatus: booool,
     csrfToken: request.csrfToken(),
   });
 });
@@ -98,6 +103,7 @@ app.get(
     if (request.accepts("html")) {
       response.render("elections", {
         elections,
+        loginStatus: request.user,
         name: request.user.email,
         csrfToken: request.csrfToken(),
       });
@@ -120,6 +126,7 @@ app.get(
       response.render("questions", {
         elections,
         questions,
+        loginStatus: request.user,
         name: request.user.email,
         csrfToken: request.csrfToken(),
       });
@@ -137,12 +144,13 @@ app.get(
   async function (request, response) {
     const loggedInAdmin = request.user.id;
     const eid = request.params.eid;
-    const election = await Elections.getElections(loggedInAdmin);
+    const election = await Elections.findOne({ where: { id: eid } });
     if (request.accepts("html")) {
       response.render("newQuestion", {
         election,
         eid,
         title: "Create Question",
+        loginStatus: request.user,
         name: request.user.email,
         csrfToken: request.csrfToken(),
       });
@@ -168,6 +176,7 @@ app.get(
         eid,
         voters,
         title: "Add Voter",
+        loginStatus: request.user,
         name: request.user.email,
         csrfToken: request.csrfToken(),
       });
@@ -225,6 +234,7 @@ app.get(
         elections,
         title: "Create Election",
         name: request.user.email,
+        loginStatus: request.user,
         csrfToken: request.csrfToken(),
       });
     } else {
@@ -330,6 +340,7 @@ app.get("/elections/:eid", async function (request, response) {
       elections,
       election,
       questions,
+      loginStatus: request.user,
       csrfToken: request.csrfToken(),
     });
   } else {

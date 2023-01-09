@@ -13,9 +13,14 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
-            <p class="py-2">Welcome to the Voting Application</p>
-            <p class="py-2">New Here? <a href="/signup" class="text-rose-600">SignUp Now </a></p>
-            <p class="py-2">Already Visited? <a href="/login" class="text-rose-600">Login</a></p>
+            <% if(loginStatus) { %>
+                Already Logged In!
+                <a href="/elections"> Click here to go to Elections </a>
+            <% } else { %>
+                <p class="py-2">Welcome to the Voting Application</p>
+                <p class="py-2">New Here? <a href="/signup" class="text-rose-600">SignUp Now </a></p>
+                <p class="py-2">Already Visited? <a href="/login" class="text-rose-600">Login</a></p>
+            <% } %>
         </div>
     </div>
 </body>
