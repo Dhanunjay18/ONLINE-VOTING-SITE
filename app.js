@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const express = require("express");
 const app = express();
-const { Admin, Elections, Questions, Voters } = require("./models");
+const { Admin, Elections, Questions, Voters, Answers } = require("./models");
 const csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
@@ -120,12 +120,17 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
     const loggedInAdmin = request.user.id;
-    const questions = await Questions.getQuestions(loggedInAdmin);
-    console.log(loggedInAdmin);
+    const question = await Questions.findOne({
+      where: { id: request.params.qid },
+    });
+    const answers = await Answers.findAll({
+      where: { qid: request.params.qid },
+    });
+    console.log(question.title);
     if (request.accepts("html")) {
-      response.render("questions", {
-        elections,
-        questions,
+      response.render("answers", {
+        answers,
+        question,
         loginStatus: request.user,
         name: request.user.email,
         csrfToken: request.csrfToken(),
@@ -134,6 +139,67 @@ app.get(
       response.json({
         elections,
       });
+    }
+  }
+);
+
+app.post(
+  "/questions/:qid",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const qid = request.params.qid;
+    if (request.body.name.length === 0) {
+      request.flash("error", "Enter a Non Blank Answer");
+      return response.redirect(`/questions/${qid}`);
+    }
+    const val = await Answers.findOne({
+      where: {
+        title: request.body.name,
+        qid: request.params.qid,
+      },
+    });
+    if (val != null) {
+      request.flash("error", "Answer Already there!");
+      return response.redirect(`/questions/${qid}`);
+    }
+    const loggedInUser = request.user.id;
+    try {
+      await Answers.create({
+        title: request.body.name,
+        qid: request.params.qid,
+      });
+      return response.redirect(`/questions/${qid}`);
+    } catch (error) {
+      console.log(error);
+      return response.redirect(`/questions/${qid}`);
+    }
+  }
+);
+
+app.delete(
+  "/questions/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    try {
+      await Answers.destroy({ where: { qid: request.params.id } });
+      await Questions.destroy({ where: { id: request.params.id } });
+      return response.json({ success: true });
+    } catch (error) {
+      return response.status(422).json(error);
+    }
+  }
+);
+
+app.delete(
+  "/answers/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    console.log("We have to delete a Answer with ID: ", request.params.id);
+    try {
+      const res = await Answers.destroy({ where: { id: request.params.id } });
+      return response.json({ success: true });
+    } catch (error) {
+      return response.status(422).json(error);
     }
   }
 );

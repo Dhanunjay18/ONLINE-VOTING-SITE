@@ -8,6 +8,24 @@
     <link href="./css/styles.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <title> Voting Platform </title>
+    <script>
+        var token = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content");
+        function deleteQuestion(id) {
+            console.log("came");
+            fetch(`/questions/${id}`, {
+                method: "delete",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ 
+                    "_csrf": token
+                })
+            })
+            .then((res) => {
+            })
+            .catch((err) => console.error(err)); 
+        }
+    </script>
 </head>
 <body class="bg-blue-300">
     <div class="grid grid-cols-6">
