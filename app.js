@@ -493,7 +493,9 @@ app.post(
   }
 );
 
-app.get("/elections/:eid", async function (request, response) {
+app.get("/elections/:eid",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
   const election = await Elections.findOne({
     where: { id: request.params.eid },
   });
