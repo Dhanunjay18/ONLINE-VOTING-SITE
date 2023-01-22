@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
       Answers.belongsTo(models.Questions, {
         foreignKey: "qid",
       });
+      Answers.hasMany(models.Votes, {
+        foreignKey: "aid",
+      });
       // define association here
     }
   }

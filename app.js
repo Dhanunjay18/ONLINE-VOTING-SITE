@@ -1,7 +1,14 @@
 /* eslint-disable no-unused-vars */
 const express = require("express");
 const app = express();
-const { Admin, Elections, Questions, Voters, Answers } = require("./models");
+const {
+  Admin,
+  Elections,
+  Questions,
+  Voters,
+  Answers,
+  Votes,
+} = require("./models");
 const csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
@@ -45,6 +52,7 @@ app.use(function (request, response, next) {
   next();
 });
 passport.use(
+  "admin",
   new LocalStrategy(
     {
       usernameField: "email",
@@ -67,19 +75,65 @@ passport.use(
   )
 );
 
+passport.use(
+  "voter",
+  new LocalStrategy(
+    {
+      usernameField: "vid",
+      passwordField: "password",
+      passReqToCallback: true,
+    },
+    (request, username, password, done) => {
+      console.log("Came p.use voter", username, "    ", password);
+      console.log(request.params.eid);
+      Voters.findOne({ where: { vid: username, eid: request.params.eid } })
+        .then(async function (voter) {
+          const result = await bcrypt.compare(voter.password, password);
+          console.log(voter.password, "  Password");
+          console.log("Result ", result);
+          if (voter.password === password) {
+            return done(null, voter);
+          } else {
+            return done(null, false, { message: "Invalid password" });
+          }
+        })
+        .catch((error) => {
+          return done(null, false, { message: "Voter not Exists" });
+        });
+    }
+  )
+);
+
 passport.serializeUser((user, done) => {
   console.log("Serializeing user in session ", user.id);
-  done(null, user.id);
+  let temp;
+  if (Object.getPrototypeOf(user) === Voters.prototype) {
+    temp = "Voter";
+  } else if (Object.getPrototypeOf(user) === Admin.prototype) {
+    temp = "Admin";
+  }
+  done(null, { id: user.id, currUser: temp });
 });
 
-passport.deserializeUser((id, done) => {
-  Admin.findByPk(id)
-    .then((user) => {
-      done(null, user);
-    })
-    .catch((error) => {
-      done(error, null);
-    });
+passport.deserializeUser(async ({ id, currUser }, done) => {
+  console.log("Curr User", currUser);
+  if (currUser === "Admin") {
+    await Admin.findByPk(id)
+      .then((user) => {
+        done(null, user);
+      })
+      .catch((error) => {
+        done(error, null);
+      });
+  } else if (currUser === "Voter") {
+    await Voters.findByPk(id)
+      .then((user) => {
+        done(null, user);
+      })
+      .catch((error) => {
+        done(error, null);
+      });
+  }
 });
 
 app.get("/", async function (request, response) {
@@ -103,6 +157,54 @@ app.get(
     if (request.accepts("html")) {
       response.render("elections", {
         elections,
+        loginStatus: request.user,
+        name: request.user.email,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        elections,
+      });
+    }
+  }
+);
+
+function ensureLoggedInVoter(request, response, next) {
+  const temp = connectEnsureLogin.ensureLoggedIn(
+    `/launch/${request.params.eid}`
+  );
+  return temp(request, response, next);
+}
+
+app.get(
+  "/launch/:eid/vote",
+  ensureLoggedInVoter,
+  async function (request, response) {
+    console.log("came /launch/eid/vote");
+    const loggedInVoter = request.user.id;
+    console.log("Voter is : ", loggedInVoter);
+    const election = await Elections.findOne({
+      where: { id: request.params.eid },
+    });
+    const questions = await Questions.findAll({
+      where: { eid: request.params.eid },
+    });
+    let answers = [];
+    for (var i = 0; i < questions.length; ++i) {
+      answers.push(await Answers.findAll({ where: { qid: questions[i].id } }));
+    }
+    const voter = await Voters.findOne({ where: { id: loggedInVoter } });
+    const voterStatus =
+      (await Votes.findOne({ where: { vid: loggedInVoter } })) === null
+        ? false
+        : true;
+    if (request.accepts("html")) {
+      response.render("votes", {
+        voter,
+        election,
+        answers,
+        questions,
+        voterStatus,
         loginStatus: request.user,
         name: request.user.email,
         csrfToken: request.csrfToken(),
@@ -523,6 +625,96 @@ app.get("/login", async (request, response) => {
   });
 });
 
+app.get(
+  "/elections/:eid/preview",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    const election = await Elections.findOne({
+      where: { id: request.params.eid },
+    });
+    const questions = await Questions.findAll({
+      where: { eid: request.params.eid },
+    });
+    const answers = await Answers.findAll();
+    const voters = await Voters.findAll({ where: { eid: request.params.eid } });
+    if (request.accepts("html")) {
+      response.render("preview", {
+        election,
+        answers,
+        questions,
+        voters,
+        title: "Preview Election",
+        name: request.user.email,
+        loginStatus: request.user,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        elections,
+      });
+    }
+  }
+);
+
+app.get(
+  "/launch/:eid",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    const election = await Elections.findOne({
+      where: { id: request.params.eid },
+    });
+    const questions = await Questions.findAll({
+      where: { eid: request.params.eid },
+    });
+    let answers = [];
+    for (var i = 0; i < questions.length; ++i) {
+      answers.push(await Answers.findAll({ where: { qid: questions[i].id } }));
+      console.log(answers[i]);
+    }
+    if (request.accepts("html")) {
+      response.render("launch", {
+        election,
+        answers,
+        questions,
+        title: "Welcome Election",
+        name: request.user.email,
+        loginStatus: request.user,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        elections,
+      });
+    }
+  }
+);
+
+app.post("/launch/:eid", ensureLoggedInVoter, async (request, response) => {
+  try {
+    Object.keys(request.body).forEach(async (answer) => {
+      console.log(answer, "-----------------------");
+      if (answer.indexOf("qid-") != -1) {
+        // splitting the name to get values
+        const key = answer.split("-");
+        const len = key.length;
+        console.log(key, "   ->   ", request.body[answer]);
+        await Votes.create({
+          qid: key[len - 1],
+          eid: request.params.eid,
+          vid: request.body.vid,
+          aid: request.body[answer],
+        });
+      }
+    });
+    response.render("votes", {
+      voterStatus: true,
+      csrfToken: request.body._csrf,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.get("/signout", async (request, response, next) => {
   request.logout((err) => {
     if (err) {
@@ -534,13 +726,29 @@ app.get("/signout", async (request, response, next) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", {
+  passport.authenticate("admin", {
     failureRedirect: "/login",
     failureFlash: true,
   }),
   function (request, response) {
     console.log(request.user);
     response.redirect("/elections");
+  }
+);
+
+app.post(
+  "/session/:eid",
+  function (request, response, next) {
+    const temp = passport.authenticate("voter", {
+      failureFlash: true,
+      failureRedirect: `/launch/${request.params.eid}`,
+    });
+    console.log("Came");
+    return temp(request, response, next);
+  },
+  (request, response) => {
+    console.log(request.user);
+    response.redirect(`/launch/${request.params.eid}/vote`);
   }
 );
 

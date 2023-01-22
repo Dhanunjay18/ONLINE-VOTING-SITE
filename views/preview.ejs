@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <link href="./css/styles.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title> Voting Platform </title>
+</head>
+<body class="bg-blue-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <h1 class="font-semibold text-2xl"> Preview of  <%= election.name %> Ballot! </h1>
+            <%
+               var f = false;
+               for(var i=0; i<questions.length; ++i) { var k = 0;  %>
+               <% for(var j=0; j<answers.length; ++j) { 
+                if((answers[j].qid) == questions[i].id) { %>
+                    <% ++k; %>
+            <% } }
+            if(k < 2) {
+                f = true;
+            }
+        } %>
+            <form action="/launch/<%= election.id %>" method="get">
+                <h1 class="text-md"> There are total <%= questions.length %> Questions in the Ballot</h1>
+                <h1 class="text-md" > There are total <%= voters.length %> Voters in the Ballot</h1><br>
+                <% if(!f || voters.length > 2) { %>
+                    <input type="submit" value="Generate and Direct to URL for Voters" class="text-black bg-green-600 hover:bg-white-800 font-medium rounded px-5 py-2"><br><br>
+                    <input type="button" value="Preview Results" class="text-black bg-yellow-600 hover:bg-white-800 font-medium rounded px-5 py-2"><br><br>
+                    <input type="button" value="End Election" class="text-black bg-red-600 hover:bg-white-800 font-medium rounded px-5 py-2">
+                <% } else { %> <h3 style="color: rgb(247, 32, 32)"> Unable to Launch Election......<br> It does not specify all requirements for launching the election</h3> <% } %>
+            </form>
+            <% if(messages && messages.error && messages.error.length > 0)  { %>
+                <% for(var i=0; i<messages.error.length; i++) { %>
+                    <li class="text-red-600"> <%= messages.error[i] %></li>
+                <% } %>
+            <% } %>
+         </div>
+</body>
+</html>

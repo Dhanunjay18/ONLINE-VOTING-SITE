@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <link href="./css/styles.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title> Voting Platform </title>
+</head>
+<body class="bg-blue-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <% if(voterStatus) { %>
+                <h1 class="text-yellow"> Your Vote has been submitted Successfully! </h1>  
+            <% } else { %>
+            <h1 class="font-semibold text-rose-600 text-2xl"> Welcome  <%= voter.vid %> ! </h1>
+            <h3 class="text-yellow-600"> NOTE : Select answers for the Questions and Cast Ur Vote! </h3>
+            <form action="/launch/<%= election.id %>" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                  <% for(var i=0; i<questions.length; ++i){ %>
+                    <h1 class="text-green-600 font-bold"><%= i+1 %>. <%= questions[i].title %></h1>
+                    <h1 class="text-green-600 font-bold">Desc : <%= questions[i].description %></h1>
+                    <% for(var j=0; j<answers[i].length; ++j) { %>
+                        <input class="p-4" type="radio" name="qid-<%= questions[i].id %>" value="<%= answers[i][j].id %>" id="aid-<%= answers[i][j].id %>" required>
+                        <label for="aid-<%= answers[i][j].id %>"><%= answers[i][j].title %></label>
+                    <br>
+                    <% } %>
+                  <% } %>  
+                  <input type="hidden" name="vid" value="<%= voter.id %>">
+                  <input type="submit" value="Cast Vote" class="text-black bg-rose-600 hover:bg-white-800 font-medium rounded px-5 py-2">
+            </form>
+            <% } %>
+            <% if(messages && messages.error && messages.error.length > 0)  { %>
+                <% for(var i=0; i<messages.error.length; i++) { %>
+                    <li class="text-red-600"> <%= messages.error[i] %></li>
+                <% } %>
+            <% } %>
+         </div>
+</body>
