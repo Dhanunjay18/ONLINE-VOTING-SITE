@@ -31,28 +31,26 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <h1 class="font-semibold text-2xl"> Welcome to <%= election.name %> Ballot! </h1>
-            <a href="/elections" style="color: blue;"> ..Go back </a> 
             <% if(questions.length === 0 ) { %>
                 <h2>You Haven't Created any Questions Yet </h2>
                 <% } else { %>
                     <div>
                         <%- include('listQuestion.ejs', {title:'Created questions', data: questions}) %>
                     </div>
-                    <p style="float:left;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/elections/<%= election.id %>/preview">Launch this Election</a></p>
-                    <br>
-                    <br>
+                    <p style="float:left;" class="text-black bg-green-600 hover:bg-white-800 font-medium rounded px-5 py-2"><a href="/elections/<%= election.id %>/preview"> Launch </a></p>
                     <% } %>                    
-                    <a href="/elections/<%= election.id %>/questions" style="color:blue"> Click here to create the Question </a>
                     <br><br>
-                    <a href="/elections/<%= election.id %>/voters" style="color:blue"> Click here to manage the Voters for Election </a>
+                    <p style="float:left" class="text-black bg-rose-600 hover:bg-white-800 font-medium rounded px-5 py-2"><a href="/elections/<%= election.id %>/questions"> New Question </a> </p>
+                    <p style="float:right" class="text-black bg-rose-600 hover:bg-white-800 font-medium rounded px-5 py-2"><a href="/elections/<%= election.id %>/voters"> Voters </a></p>
                     <br><br>
                     <% if(messages && messages.error && messages.error.length > 0)  { %>
                         <% for(var i=0; i<messages.error.length; i++) { %>
                             <li class="text-red-600"> <%= messages.error[i] %></li>
                         <% } %>
                     <% } %>
-                            
-                    <p style="float: left;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/signout">Sign Out</a></p>
+                    <input type="button" value="Go back" onclick="history. back()" class="text-black bg-yellow-600 hover:bg-white-800 font-medium rounded px-5 py-2">                            
+                    <br><br>
+                    <p style="float: left;" class="text-black bg-rose-600 hover:bg-white-800 font-medium rounded px-5 py-2"><a href="/signout">Sign Out</a></p>
                     </div>
     </body>
 </html>

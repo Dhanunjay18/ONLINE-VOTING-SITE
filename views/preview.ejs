@@ -30,7 +30,8 @@
                 <% if(!f && voters.length > 2) { %>
                     <input type="submit" value="Generate and Direct to URL for Voters" class="text-black bg-green-600 hover:bg-white-800 font-medium rounded px-5 py-2"><br><br>
                     <input type="button" value="Preview Results" class="text-black bg-yellow-600 hover:bg-white-800 font-medium rounded px-5 py-2"><br><br>
-                    <input type="button" value="End Election" class="text-black bg-red-600 hover:bg-white-800 font-medium rounded px-5 py-2">
+                    <input type="button" value="End Election" class="text-black bg-red-600 hover:bg-white-800 font-medium rounded px-5 py-2"><br><br>
+                    <input type="button" value="Go back" onclick="history. back()" class="text-black bg-yellow-600 hover:bg-white-800 font-medium rounded px-5 py-2">
                 <% } else { %> <h3 style="color: rgb(247, 32, 32)"> Unable to Launch Election......<br> It does not specify all requirements for launching the election</h3> <% } %>
             </form>
             <% if(messages && messages.error && messages.error.length > 0)  { %>

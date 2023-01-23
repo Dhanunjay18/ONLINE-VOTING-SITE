@@ -35,7 +35,9 @@
               <div>
                 <%- include('voters.ejs', {title:'Registered Voters', data: voters}) %>
               </div>
-              <p style="float: left;" class="border rounded bg-rose-600 border-solid text-white rounded"><a href="/signout">Sign Out</a></p>
+              <input type="button" value="Go back" onclick="history. back()" class="text-black bg-yellow-600 hover:bg-white-800 font-medium rounded px-5 py-2">                            
+              <br><br>
+              <p style="float: left;" class="text-black bg-rose-600 hover:bg-white-800 font-medium rounded px-5 py-2"><a href="/signout">Sign Out</a></p>
     </div>
 </body>
 </html>
