@@ -283,24 +283,29 @@ app.delete(
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
     try {
+      await Votes.destroy({ where: { qid: request.params.id } });
       await Answers.destroy({ where: { qid: request.params.id } });
       await Questions.destroy({ where: { id: request.params.id } });
+      console.log("Deletedd]-----------------------------------------------------------------------------------")
       return response.json({ success: true });
     } catch (error) {
       return response.status(422).json(error);
     }
   }
-);
-
-app.delete(
-  "/answers/:id",
-  connectEnsureLogin.ensureLoggedIn(),
-  async function (request, response) {
-    console.log("We have to delete a Answer with ID: ", request.params.id);
-    try {
-      const res = await Answers.destroy({ where: { id: request.params.id } });
+  );
+  
+  app.delete(
+    "/answers/:id",
+    connectEnsureLogin.ensureLoggedIn(),
+    async function (request, response) {
+      console.log("We have to delete a Answer with ID: ", request.params.id);
+      try {
+      await Votes.destroy({ where: { aid: request.params.id } });
+      await Answers.deleteAns(request.params.id);
+      console.log("Deletedd]-----------------------------------------------------------------------------------")
       return response.json({ success: true });
     } catch (error) {
+      console.log(error)
       return response.status(422).json(error);
     }
   }

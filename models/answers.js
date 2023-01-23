@@ -16,6 +16,14 @@ module.exports = (sequelize, DataTypes) => {
       });
       // define association here
     }
+
+    static async deleteAns(id) {
+      return this.destroy({
+        where : {
+          id: id
+        }
+      })
+    }
   }
   Answers.init(
     {
