@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <link href="./css/styles.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title> Voting Platform </title>
+</head>
+<body class="bg-blue-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <h1 class="font-semibold text-2xl"> Current Status <%= election.name %> Election! </h1>
+            <h1 class="font-semibold text-2xl text-green-600"> Voters Casted their votes : <%= votes.length %> </h1>
+            <h1 class="font-semibold text-2xl text-red-400"> Voters Remaining to Cast their Vote : <%= voters.length - votes.length %> </h1>
+            <% if(votes.length!=0) { %> 
+                
+            <% } %>
+            <% if(messages && messages.error && messages.error.length > 0)  { %>
+                <% for(var i=0; i<messages.error.length; i++) { %>
+                    <li class="text-red-600"> <%= messages.error[i] %></li>
+                <% } %>
+            <% } %>
+         </div>
+    </div>
+</body>
+</html>

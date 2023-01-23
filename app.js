@@ -722,6 +722,35 @@ app.post("/launch/:eid", ensureLoggedInVoter, async (request, response) => {
   }
 });
 
+app.get(
+  "/elections/:eid/status",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    const votes = await Votes.findAll({where : {eid : request.params.eid}});
+    const voters = await Voters.findAll({where : {eid: request.params.eid}});
+    const questions = await Questions.findAll({where : {eid: request.params.eid}});
+    // let answers = []
+    // for(var i=0; i<questions.length; ++i) {
+    //   const ans =  await Votes.getCount(questions[i].id);
+    //   console.log("Ans for ", questions[i].id, " is ", ans.length);
+    // }
+    if (request.accepts("html")) {
+      response.render("status", {
+        votes,
+        voters,
+        election : await Elections.findByPk(request.params.eid),
+        name: request.user.email,
+        loginStatus: request.user,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({
+        elections,
+      });
+    }
+  }
+);
+
 app.get("/signout", async (request, response, next) => {
   request.logout((err) => {
     if (err) {

@@ -22,6 +22,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "aid",
       });
     }
+    static getCount(qid) {
+      return this.findAll({
+        attributes: [
+           sequelize.fn('MAX', sequelize.col('aid'))
+        ],
+        where: {
+          'qid': qid
+        }
+      });
+    }
   }
   Votes.init(
     {
