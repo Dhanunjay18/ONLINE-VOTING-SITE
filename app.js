@@ -227,7 +227,7 @@ app.get(
     });
     const answers = await Answers.findAll({
       where: { qid: request.params.qid },
-    });
+    }); 
     console.log(question.title);
     if (request.accepts("html")) {
       response.render("answers", {
@@ -287,6 +287,25 @@ app.delete(
       await Answers.destroy({ where: { qid: request.params.id } });
       await Questions.destroy({ where: { id: request.params.id } });
       console.log("Deletedd]-----------------------------------------------------------------------------------")
+      return response.json({ success: true });
+    } catch (error) {
+      return response.status(422).json(error);
+    }
+  }
+  );
+
+app.delete(
+  "/elections/:eid/preview",
+  connectEnsureLogin.ensureLoggedIn(),
+  async function (request, response) {
+    try {
+      const questions = await Questions.findAll({where : {id : request.params.eid}});
+      await Votes.destroy({ where: { eid: request.params.eid } });
+      for(var i=0; i<questions.length; ++i)
+        await Answers.destroy({ where: { qid: questions[i].id } });
+      await Questions.destroy({ where: { eid: request.params.eid } });
+      await Elections.destroy({where : { id : request.params.eid }})
+      console.log("Deletedd-----------------------------------------------------------------------------------")
       return response.json({ success: true });
     } catch (error) {
       return response.status(422).json(error);
@@ -438,9 +457,10 @@ app.post(
     }
     const loggedInUser = request.user.id;
     try {
-      await Elections.addElections({
+      await Elections.create({
         name: request.body.name,
         adminId: loggedInUser,
+        electionStatus: false,
       });
       const eid = await Elections.findOne({
         where: {
@@ -747,6 +767,61 @@ app.get(
       response.json({
         elections,
       });
+    }
+  }
+);
+
+app.post(
+  "/elections/:eid/endElection",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const questions = await Questions.findAll({where : {eid : request.params.eid}});
+      const votes = await Votes.findAll({ where: { eid: request.params.eid } });
+      const voters = await Voters.findAll({where : {eid : request.params.eid }});
+      let answers = []
+      for(var i=0; i<questions.length; ++i) {
+        const tempAns = await Answers.findAll({ where: { qid: questions[i].id } });
+        answers.push(tempAns[0]);
+        for(var j=0; j<tempAns.length; ++j) {
+          const tempVotes = await Votes.findAll({
+            where : {
+              qid : questions[i].id,
+              aid : tempAns[j].id
+            }
+          })
+          if(tempVotes.length < answers[i]) {
+            answers[i] = await Answers.findOne({where : {id : tempAns[j].id}})
+          }
+        }
+        console.log(questions[i].tittle, "-------------", answers[i].title)
+      }      
+      await Elections.update(
+        { electionStatus: true, },
+        { where: {id: request.params.eid, },
+      })
+      const election = await Elections.findByPk(request.params.eid)
+      console.log(election.electionStatus, "------------------------------------")
+      if (request.accepts("html")) {
+        response.render("launch", {
+          votes,
+          voters,
+          questions, 
+          answers,
+          election,
+          title : "End Election",
+          name: request.user.email,
+          loginStatus: request.user,
+          csrfToken: request.body._csrf
+        });
+        } else {
+        response.json({
+          elections,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return response.redirect(`/elections/${request.params.eid}/preview`);
     }
   }
 );

@@ -22,12 +22,13 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static addElections({ name, adminId }) {
+    static addElections({ name, adminId, electionStatus }) {
       return this.create({
         name: name,
         // dueDate: dueDate,
         // completed: false,
         adminId,
+        electionsStatus: electionStatus
       });
     }
 
@@ -51,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
   Elections.init(
     {
       name: DataTypes.STRING,
+      electionStatus: DataTypes.BOOLEAN
     },
     {
       sequelize,
